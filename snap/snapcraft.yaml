@@ -3,11 +3,11 @@ base: core24
 version: '0.1'
 summary: Demonstration app using Ubuntu Core and a Raspberry Pi.
 description: This is a small app used to demonstrate using Ubuntu Core with a Raspberry Pi.
-             LED blinks on GPIO 24 or pin 18 of Raspberry Pi.
+  LED blinks on GPIO 24 or pin 18 of Raspberry Pi.
 
 platforms:
   arm64:
-    build-on: [amd64]
+    build-on: [arm64]  # Launchpad will build on arm64
     build-for: [arm64]
 
 grade: stable
@@ -27,17 +27,9 @@ parts:
     cmake-generator: Unix Makefiles
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=
-      - -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc
-    override-pull: |
-      snapcraftctl pull
-      echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports noble main universe" > /etc/apt/sources.list.d/arm64.list
-      dpkg --add-architecture arm64
-      apt-get update
     build-packages:
       - build-essential
       - libgpiod-dev
-      - gcc-aarch64-linux-gnu
-      - libc6-dev:arm64
     stage-packages:
       - libc6
       - libgpiod2
