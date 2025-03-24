@@ -13,7 +13,7 @@ int main() {
     }
 
     syslog(LOG_INFO, "Getting GPIO 24...");
-    struct gpiod_line *line = gpiod_chip_get_line(chip, 24);
+    struct gpiod_line *line = gpiod_chip_get_line(chip, 25);
     if (!line) {
         syslog(LOG_ERR, "Unable to get GPIO 24: %m");
         gpiod_chip_close(chip);
