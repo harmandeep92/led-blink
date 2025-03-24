@@ -1,47 +1,47 @@
 #include <gpiod.h>
-#include <stdio.h>
 #include <unistd.h>
+#include <syslog.h>
 
 int main() {
-    struct gpiod_chip *chip;
-    struct gpiod_line *line;
-    int ret;
-
-    printf("Opening gpiochip0...\n");
-    chip = gpiod_chip_open_by_name("gpiochip0");
+    openlog("led-blink", LOG_PID | LOG_CONS, LOG_USER);
+    syslog(LOG_INFO, "Opening gpiochip0...");
+    struct gpiod_chip *chip = gpiod_chip_open_by_name("gpiochip0");
     if (!chip) {
-        perror("Unable to open gpiochip0");
+        syslog(LOG_ERR, "Unable to open gpiochip0: %m");
+        closelog();
         return 1;
     }
 
-    printf("Getting GPIO 24...\n");
-    line = gpiod_chip_get_line(chip, 24);
+    syslog(LOG_INFO, "Getting GPIO 24...");
+    struct gpiod_line *line = gpiod_chip_get_line(chip, 24);
     if (!line) {
-        perror("Unable to get GPIO 24");
+        syslog(LOG_ERR, "Unable to get GPIO 24: %m");
         gpiod_chip_close(chip);
+        closelog();
         return 1;
     }
 
-    printf("Setting GPIO 24 as output...\n");
-    ret = gpiod_line_request_output(line, "led-blink", 0);
-    if (ret < 0) {
-        perror("Unable to set GPIO 24 as output");
+    syslog(LOG_INFO, "Setting GPIO 24 as output...");
+    if (gpiod_line_request_output(line, "led-blink", 0) < 0) {
+        syslog(LOG_ERR, "Unable to set GPIO 24 as output: %m");
         gpiod_line_release(line);
         gpiod_chip_close(chip);
+        closelog();
         return 1;
     }
 
-    printf("Starting blink loop...\n");
+    syslog(LOG_INFO, "Starting blink loop...");
     while (1) {
-        printf("Setting GPIO 24 high\n");
+        syslog(LOG_INFO, "Setting GPIO 24 high");
         gpiod_line_set_value(line, 1);
-        usleep(500000);
-        printf("Setting GPIO 24 low\n");
+        usleep(1000000);
+        syslog(LOG_INFO, "Setting GPIO 24 low");
         gpiod_line_set_value(line, 0);
-        usleep(500000);
+        usleep(1000000);
     }
 
     gpiod_line_release(line);
     gpiod_chip_close(chip);
+    closelog();
     return 0;
 }
