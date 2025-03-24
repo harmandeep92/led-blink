@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.9.1)
+project(led-blink C)
+add_executable(led-blink led-blink.c)
+target_link_libraries(led-blink gpiod)
+install(TARGETS led-blink DESTINATION bin)
