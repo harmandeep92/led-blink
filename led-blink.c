@@ -15,7 +15,7 @@ int main() {
     syslog(LOG_INFO, "Getting GPIO 24...");
     struct gpiod_line *line = gpiod_chip_get_line(chip, 25);
     if (!line) {
-        syslog(LOG_ERR, "Unable to get GPIO 24: %m");
+        syslog(LOG_ERR, "Unable to get GPIO 25: %m");
         gpiod_chip_close(chip);
         closelog();
         return 1;
@@ -23,7 +23,7 @@ int main() {
 
     syslog(LOG_INFO, "Setting GPIO 24 as output...");
     if (gpiod_line_request_output(line, "led-blink", 0) < 0) {
-        syslog(LOG_ERR, "Unable to set GPIO 24 as output: %m");
+        syslog(LOG_ERR, "Unable to set GPIO 25 as output: %m");
         gpiod_line_release(line);
         gpiod_chip_close(chip);
         closelog();
@@ -32,10 +32,10 @@ int main() {
 
     syslog(LOG_INFO, "Starting blink loop...");
     while (1) {
-        syslog(LOG_INFO, "Setting GPIO 24 high");
+        syslog(LOG_INFO, "Setting GPIO 25 high");
         gpiod_line_set_value(line, 1);
         usleep(1000000);
-        syslog(LOG_INFO, "Setting GPIO 24 low");
+        syslog(LOG_INFO, "Setting GPIO 25 low");
         gpiod_line_set_value(line, 0);
         usleep(1000000);
     }
