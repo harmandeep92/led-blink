@@ -21,6 +21,7 @@ apps:
       - hardware-observe
       - gpio-control
       - gpio-dev
+      - gpio
 
 plugs:
   gpio-dev:
