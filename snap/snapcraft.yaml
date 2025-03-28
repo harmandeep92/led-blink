@@ -19,6 +19,7 @@ apps:
     command: bin/led-blink
     plugs:
       - gpio
+      - hardware-observe
 
 parts:
   led-blink:
