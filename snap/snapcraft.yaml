@@ -20,6 +20,7 @@ apps:
     plugs:
       - gpio-dev
       - hardware-observe
+      - gpio-control
 
 plugs:
   gpio-dev:
