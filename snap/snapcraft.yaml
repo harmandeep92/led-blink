@@ -11,7 +11,7 @@ platforms:
     build-for: [arm64]
 
 grade: stable
-confinement: devmode
+confinement: strict
 
 apps:
   led-blink:
