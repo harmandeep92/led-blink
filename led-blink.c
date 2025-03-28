@@ -5,7 +5,7 @@
 int main() {
     openlog("led-blink", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "Opening gpiochip0...");
-    struct gpiod_chip *chip = gpiod_chip_open_by_name("gpiochip0");
+    struct gpiod_chip *chip = gpiod_chip_open_by_name("/dev/gpiochip0");
     if (!chip) {
         syslog(LOG_ERR, "Unable to open gpiochip0: %m");
         closelog();
