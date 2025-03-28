@@ -24,6 +24,11 @@ plugs:
   gpio-control:
     interface: gpio-control
     gpiochip: "0"
+  gpio-dev:
+    interface: system-files
+    write:
+      - /dev/gpiochip0
+      - /dev/gpiochip1
 
 parts:
   led-blink:
