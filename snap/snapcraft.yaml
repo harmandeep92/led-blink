@@ -7,7 +7,7 @@ description: This is a small app used to demonstrate using Ubuntu Core with a Ra
 
 platforms:
   arm64:
-    build-on: [arm64]  # Launchpad will build on arm64
+    build-on: [arm64]
     build-for: [arm64]
 
 grade: stable
@@ -18,12 +18,9 @@ apps:
     daemon: simple
     command: bin/led-blink
     plugs:
-      - gpio-control
+      - gpio-dev
 
 plugs:
-  gpio-control:
-    interface: gpio-control
-    gpiochip: "0"
   gpio-dev:
     interface: system-files
     write:
