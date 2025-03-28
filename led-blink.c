@@ -1,72 +1,47 @@
-#include <stdio.h>
+#include <gpiod.h>
 #include <unistd.h>
 #include <syslog.h>
-#include <errno.h>
-#include <string.h>
-
-#define GPIO 25
 
 int main() {
-    // Initialize syslog for logging
     openlog("led-blink", LOG_PID | LOG_CONS, LOG_USER);
-
-    // Construct sysfs paths for GPIO 25
-    char direction_path[50];
-    char value_path[50];
-    sprintf(direction_path, "/sys/class/gpio/gpio%d/direction", GPIO);
-    sprintf(value_path, "/sys/class/gpio/gpio%d/value", GPIO);
-
-    // Set GPIO direction to output
-    syslog(LOG_INFO, "Setting GPIO %d as output...", GPIO);
-    FILE *dir_file = fopen(direction_path, "w");
-    if (!dir_file) {
-        syslog(LOG_ERR, "Unable to open direction file %s: %s", direction_path, strerror(errno));
+    syslog(LOG_INFO, "Opening gpiochip0...");
+    struct gpiod_chip *chip = gpiod_chip_open_by_name("gpiochip0");
+    if (!chip) {
+        syslog(LOG_ERR, "Unable to open gpiochip0: %m");
         closelog();
         return 1;
     }
-    if (fprintf(dir_file, "out") < 0) {
-        syslog(LOG_ERR, "Unable to set GPIO %d direction to out: %s", GPIO, strerror(errno));
-        fclose(dir_file);
+
+    syslog(LOG_INFO, "Getting GPIO 24...");
+    struct gpiod_line *line = gpiod_chip_get_line(chip, 25);
+    if (!line) {
+        syslog(LOG_ERR, "Unable to get GPIO 25: %m");
+        gpiod_chip_close(chip);
         closelog();
         return 1;
     }
-    fclose(dir_file);
 
-    // Blink loop
+    syslog(LOG_INFO, "Setting GPIO 24 as output...");
+    if (gpiod_line_request_output(line, "led-blink", 0) < 0) {
+        syslog(LOG_ERR, "Unable to set GPIO 25 as output: %m");
+        gpiod_line_release(line);
+        gpiod_chip_close(chip);
+        closelog();
+        return 1;
+    }
+
     syslog(LOG_INFO, "Starting blink loop...");
     while (1) {
-        // Set GPIO high (LED on)
-        FILE *val_file = fopen(value_path, "w");
-        if (!val_file) {
-            syslog(LOG_ERR, "Unable to open value file %s: %s", value_path, strerror(errno));
-            sleep(1); // Prevent busy looping on error
-            continue;
-        }
-        if (fprintf(val_file, "1") < 0) {
-            syslog(LOG_ERR, "Unable to set GPIO %d to 1: %s", GPIO, strerror(errno));
-        } else {
-            syslog(LOG_INFO, "Setting GPIO %d high", GPIO);
-        }
-        fclose(val_file);
-        sleep(1); // 1-second delay (equivalent to usleep(1000000))
-
-        // Set GPIO low (LED off)
-        val_file = fopen(value_path, "w");
-        if (!val_file) {
-            syslog(LOG_ERR, "Unable to open value file %s: %s", value_path, strerror(errno));
-            sleep(1); // Prevent busy looping on error
-            continue;
-        }
-        if (fprintf(val_file, "0") < 0) {
-            syslog(LOG_ERR, "Unable to set GPIO %d to 0: %s", GPIO, strerror(errno));
-        } else {
-            syslog(LOG_INFO, "Setting GPIO %d low", GPIO);
-        }
-        fclose(val_file);
-        sleep(1); // 1-second delay
+        syslog(LOG_INFO, "Setting GPIO 25 high");
+        gpiod_line_set_value(line, 1);
+        usleep(1000000);
+        syslog(LOG_INFO, "Setting GPIO 25 low");
+        gpiod_line_set_value(line, 0);
+        usleep(1000000);
     }
 
-    // Cleanup (unreachable due to infinite loop, but included for completeness)
+    gpiod_line_release(line);
+    gpiod_chip_close(chip);
     closelog();
     return 0;
 }
