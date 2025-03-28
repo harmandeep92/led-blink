@@ -19,6 +19,7 @@ apps:
     command: bin/led-blink
     plugs:
       - gpio-dev
+      - hardware-observe
 
 plugs:
   gpio-dev:
@@ -40,7 +41,3 @@ parts:
     stage-packages:
       - libc6
       - libgpiod2
-    stage:
-      - -/dev/*  # Exclude all default /dev/ entries
-      - /dev/gpiochip0  # Explicitly include gpiochip0
-      - /dev/gpiochip1  # Explicitly include gpiochip1 if needed
