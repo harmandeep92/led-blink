@@ -18,9 +18,12 @@ apps:
     daemon: simple
     command: bin/led-blink
     plugs:
-      - gpio
-      - hardware-observe
       - gpio-control
+
+plugs:
+  gpio-control:
+    interface: gpio-control
+    gpiochip: "0"
 
 parts:
   led-blink:
